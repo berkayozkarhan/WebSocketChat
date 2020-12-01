@@ -34,7 +34,7 @@ async def client_handler(websocket,path):
     #Çünkü sefver tarafında yönlendirme yapmak için websocket.send() fonksiyonu gereklidir ve bunun için de ilgili
     #soket nesnesinin bulunması gerekir.İstemciden gelen mesajlar yönlendirilirken user_ID değerine göre soket nesnesi
     #seçilip yönlendirilecektir.-Berkay
-    clients[websocket] = {"name": name,"user_id":_client.userID}  # Bu liste olayında anlayamadığım şeyler var.Hocaya sor.
+    clients[websocket] = {"name": name,"user_id":_client.userID} 
     clientsNotification.append({"username":name,"user_ID":"{}".format(_client.userID),"status":_client.status})
     print("--------------------------------------------")
     print('({} existing clients)'.format(len(clients)))
@@ -46,21 +46,20 @@ async def client_handler(websocket,path):
     print("--------------------------------------------")
     showClients(clients)
     print("--------------------------------------------")
-    #print(clients.items())
-    #print("--------------------------------------------")
     await notify_New_User(clients,_client)
 
     #Handle messages from this client
     while True:
         incoming_data = await websocket.recv()#Mesajlaşmanın başladığı yer.
-        incoming_data_json = json.loads(incoming_data)#C#'tan gelen Message sınıfı parse ediliyor.
+        incoming_data_json = json.loads(incoming_data)#C#'tan gelen Message sınıfı parçalanıyor.
         print("incoming_data_json:")
         print(incoming_data_json)#Json pars edilen data kontrol amaçlı ekrana yazılıyor.
         message = incoming_data_json['message']#Gelen veriden mesaj bilgisi ayrılıyor.
-        #Tam olarak bu noktada mesajın ilgili istemciye yönlendirilmesi yapılması gerekir.
+        #Bu noktada gelen mesajın türüne göre yönlendirme işlemi yapılacak.Aynı zamanda .net tarafında disconnect butonuna basıldığında gönderilecek sunucudan ayrılma isteği ile
+        #ilgili istemci çevrimiçi listesinden çıkarılacak.
         # Herhangi bir istemci mesaj gönderdiği zaman.Aynı zamanda mesaj yönlendirme işlemi buraya eklenecek.
         for client, _ in clients.items():
-            if client != _client:
+            if client != _client:#Mesajı gönderen istemciye tekrar mesajı göndermemek için liste içinde kontrol ediliyor.
                 messageToAllUsers = MyMsg("broadcast",
                                                    "server",
                                                    "everyone",
@@ -68,7 +67,7 @@ async def client_handler(websocket,path):
                                                    datetime.datetime.utcnow().isoformat() + "Z")
                 messageToAllUsers_JSON = json.loads(json.dumps(messageToAllUsers.__dict__))
                 await client.send("{}".format(messageToAllUsers_JSON))
-                #await client.send("{}: {}".format(_client.username, incoming_data_json['message']))
+                
 
         if message is None:
             their_name = clients[websocket]
