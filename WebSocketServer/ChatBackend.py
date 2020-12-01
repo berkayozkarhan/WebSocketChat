@@ -71,40 +71,4 @@ async def notify_New_User(clientsList,_client):
 
 
 
-""""
-class ChatBackend:
-    def __init__(self):
-        self.clients = list()
-
-
-def state_event():
-    return json.dumps({"type":"state"},**STATE)
-
-def users_event(clients):
-    for client, _ in clients.items():
-        print("Users event çalışıyor.")
-        client.userID
-        print("Users event bitti")
-
-async def notify_state(clients):
-        if clients:
-            message = state_event()
-            await asyncio.wait([user.send(message) for user in clients])
-
-async def notify_users(clients):
-    if clients:
-        message = users_event(clients)
-        await asyncio.wait([user.send(message) for user in clients])
-
-async def register(websocket,clients):
-        clients.add(websocket)
-        await notify_state(clients)
-
-async def counter(websocket,path):
-    #register(websocket) sends user_event() to websocket
-    #await register(websocket,clients)
-     pass
-"""
-
-
 
